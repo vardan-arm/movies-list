@@ -1,5 +1,5 @@
 import {useState, useEffect, useCallback} from 'react';
-import {Star, ChevronDown, ChevronUp} from 'lucide-react';
+import {Star, ChevronDown, ChevronUp, Menu, X} from 'lucide-react';
 
 // TODO: I intentionally kept `API_KEY` here to not spend time on deployment. In a real app, this would be stored in `.env` file
 const API_KEY = 'dfba7ad103c688fd477dddc0a35f3fa9';
@@ -17,6 +17,7 @@ interface IGenre {
 const MovieDashboard = () => {
   const [movies, setMovies] = useState<IMovie[]>([]);
   const [genres, setGenres] = useState<IGenre[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [page, setPage] = useState(1);
 
@@ -71,25 +72,42 @@ const MovieDashboard = () => {
     return 'text-red-500';
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-1/5 bg-gray-800 p-6 pb-4 flex flex-col justify-between">
+    <div className="flex flex-col h-screen bg-gray-100 lg:flex-row">
+      <button
+        className={`lg:hidden fixed top-4 left-4 z-50 ${isMenuOpen ? 'bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'} text-white p-2 rounded`}
+        onClick={toggleMenu}
+      >
+        {isMenuOpen ? <X size={24} /> : <Menu />}
+      </button>
+
+      <div className={`
+        w-full lg:w-1/5 bg-gray-800 p-6 pb-4 flex flex-col justify-between
+        fixed inset-y-0 left-0 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        pt-16 lg:pt-0
+        lg:relative lg:translate-x-0 transition duration-200 ease-in-out z-40
+      `}>
         <div>
           <h2 className="text-white text-2xl font-bold mb-6">Main Menu</h2>
           <ul>
-            <li className="hover:cursor-pointer hover:opacity-80">Menu item 1</li>
-            <li className="hover:cursor-pointer hover:opacity-80">Menu item 2</li>
+            <li className="text-white hover:text-gray-300 cursor-pointer mb-2">Menu item 1</li>
+            <li className="text-white hover:text-gray-300 cursor-pointer mb-2">Menu item 2</li>
           </ul>
         </div>
-        <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-300">Log out
+        <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-300">
+          Log out
         </button>
       </div>
 
-      <div className="w-4/5 flex flex-col">
+      <div className="w-full lg:w-4/5 flex flex-col">
         <header className="bg-white shadow p-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">Popular Movies</h1>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-300">Header
-            Button
+          <h1 className="ml-12 text-lg lg:ml-0 lg:text-2xl font-bold text-gray-800">Popular Movies</h1>
+          <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-300">
+            Header Button
           </button>
         </header>
 
@@ -128,11 +146,12 @@ const MovieDashboard = () => {
                     <ChevronDown className="w-6 h-6 text-gray-500" />}
                 </div>
                 <div
-                  className={`p-4 bg-gray-50 transition-all duration-500 ${expandedCard === movie.id ? 'opacity-100 max-h-[600px]' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+                  className={`p-4 transition-all duration-500 ${expandedCard === movie.id ? 'opacity-100 max-h-[600px]' : 'opacity-0 max-h-0 overflow-hidden'}`}>
                   <div className="lg:flex mb-4 lg:gap-6 mr-2 lg:mr-8">
                     <div className="text-gray-600 shrink-0">
                       <p className="mb-2"><span
-                        className="font-bold">Original Language:</span> {(movie.original_language as string).toUpperCase()}</p>
+                        className="font-bold">Original Language:</span> {(movie.original_language as string).toUpperCase()}
+                      </p>
                       <p className="mb-2"><span
                         className="font-bold">Adult Content:</span> {movie.adult ? 'Yes' : 'No'}</p>
                       <p className="mb-2"><span className="font-bold">Vote Count:</span> {movie.vote_count}
@@ -156,7 +175,8 @@ const MovieDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-center md:justify-end space-x-2 mx-2 md:mr-8 text-[12px] font-semibold lg:font-normal lg:text-base ">
+                  <div
+                    className="flex justify-center md:justify-end space-x-2 mx-2 md:mr-8 text-[12px] font-semibold lg:font-normal lg:text-base ">
                     <button
                       className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded transition duration-300"
                       onClick={(e) => {
@@ -193,8 +213,10 @@ const MovieDashboard = () => {
           >
             Previous Page
           </button>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-300"
-                  onClick={() => setPage(prevPage => prevPage + 1)}>
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-300"
+            onClick={() => setPage(prevPage => prevPage + 1)}
+          >
             Next Page
           </button>
         </footer>
